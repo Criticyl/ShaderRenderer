@@ -6,6 +6,10 @@
 *.vcxproj
 *.vcxproj.filters
 
+#Intermediate files
+
+ShaderRenderer.dir/
+
 #CMake
 
 CMakeLists.txt.user
