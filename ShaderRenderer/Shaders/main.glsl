@@ -6,62 +6,60 @@ layout (local_size_x = 16, local_size_y = 16) in;
 
 uniform float time;
 
-vec2 iResolution = vec2(1280.0, 720.0);
+//This is an example shader. Original shader came from:
+//http://glslsandbox.com/e#23237.0
+//
+//Code from: https://www.shadertoy.com/view/llS3RK
 
-// Shader Code goes here vvv
-
-#define iterations 17
-#define formuparam 0.53
-
-#define volsteps 20
-#define stepsize 0.1
-
-#define zoom   0.800
-#define tile   0.850
-#define speed  0.010 
-
-#define brightness 0.0015
-#define darkmatter 0.300
-#define distfading 0.730
-#define saturation 0.850
-
-
-
-vec4 shaderCode(ivec2 I)
-{
-    //get coords and direction
-	vec2 uv=I.xy/iResolution.xy-.5;
-	uv.y*=iResolution.y/iResolution.x;
-	vec3 dir=vec3(uv*zoom,1.);
-	float time=time*speed+.25;
-	
-	vec3 from=vec3(1.,.5,0.5);
-	from+=vec3(time*2.,time,-2.);
-	//volumetric rendering
-	float s=0.1,fade=1.;
-	vec3 v=vec3(0.);
-	for (int r=0; r<volsteps; r++) {
-		vec3 p=from+s*dir*.5;
-		p = abs(vec3(tile)-mod(p,vec3(tile*2.))); // tiling fold
-		float pa,a=pa=0.;
-		for (int i=0; i<iterations; i++) { 
-			p=abs(p)/dot(p,p)-formuparam; // the magic formula
-			a+=abs(length(p)-pa); // absolute sum of average change
-			pa=length(p);
-		}
-		float dm=max(0.,darkmatter-a*a*.001); //dark matter
-		a*=a*a; // add contrast
-		if (r>6) fade*=1.-dm; // dark matter, don't render near
-		//v+=vec3(dm,dm*.5,0.);
-		v+=fade;
-		v+=vec3(s,s*s,s*s*s*s)*a*brightness*fade; // coloring based on distance
-		fade*=distfading; // distance fading
-		s+=stepsize;
-	}
-	v=mix(vec3(length(v)),v,saturation); //color adjust
-	return vec4(v*.01,1.);	
+//Calculate the squared length of a vector
+float length2(vec2 p){
+    return dot(p,p);
 }
 
+//Generate some noise to scatter points.
+float noise(vec2 p){
+	return fract(sin(fract(sin(p.x) * (43.13311)) + p.y) * 31.0011);
+}
+
+float worley(vec2 p) {
+    //Set our distance to infinity
+	float d = 1e30;
+    //For the 9 surrounding grid points
+	for (int xo = -1; xo <= 1; ++xo) {
+		for (int yo = -1; yo <= 1; ++yo) {
+            //Floor our vec2 and add an offset to create our point
+			vec2 tp = floor(p) + vec2(xo, yo);
+            //Calculate the minimum distance for this grid point
+            //Mix in the noise value too!
+			d = min(d, length2(p - tp - noise(tp)));
+		}
+	}
+	return 3.0*exp(-4.0*abs(2.5*d - 1.0));
+}
+
+float fworley(vec2 p) {
+    //Stack noise layers 
+	return sqrt(sqrt(sqrt(
+		worley(p*5.0 + 0.05*time) *
+		sqrt(worley(p * 50.0 + 0.12 + -0.1*time)) *
+		sqrt(sqrt(worley(p * -10.0 + 0.03*time))))));
+}
+
+// Edit Shader Main code here, do not delete function as its required in the main function.
+vec4 shaderCode(ivec2 texCoord)
+{
+    vec2 iResolution = vec2(1280, 720);
+    vec2 uv = texCoord.xy / iResolution.xy;
+    //Calculate an intensity
+    float t = fworley(uv * iResolution.xy / 1500.0);
+    //Add some gradient
+    t*=exp(-length2(abs(0.7*uv - 1.0)));	
+    //Make it blue!
+    return vec4(t * vec3(0.1, 1.1*t, pow(t, 0.5-t)), 1.0);
+}
+
+
+// ----------------- DO NOT DELETE ---------------
 void main()
 {
     ivec2 texCoord = ivec2(gl_GlobalInvocationID.xy);
