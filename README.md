@@ -1,5 +1,5 @@
 # Shader Renderer
-A simple program that renders shader programs using a compute shader.
+A simple program that renders shader programs using a compute shader. (With the help from TheCherno's video).
 
 ## Building the project
 
