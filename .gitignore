@@ -10,6 +10,13 @@
 
 ShaderRenderer.dir/
 
+#Folders
+x64/
+Debug/
+Shaders/
+*.dir/
+
+
 #CMake
 
 CMakeLists.txt.user
