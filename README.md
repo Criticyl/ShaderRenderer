@@ -1,6 +1,8 @@
 # Shader Renderer
 A simple program that renders shader programs using a compute shader. (With the help from TheCherno's video).
 
+Press R to reload shaders.
+
 ## Building the project
 
 Build the project using CMake and following these steps:
@@ -35,3 +37,10 @@ The project uses the following external dependencies:
 * **GLFW**: Library for creating window contexts using OpenGL
 * **Glad**: Library for more Modern OpenGL functions
 * **GLM**: C++ Maths library.
+
+# Future Plans
+
+Planning on adding a GUI to it (With ImGui) so that shader files can be imported and exported.
+Eventually I do want to make this some kind of tool similar to Shadertoy where you can just mess around with making shaders.
+
+I also plan on adding a lot more uniforms to this, currently the only uniform added is time.
