@@ -68,12 +68,22 @@ void Shader::CreateShader(const::std::filesystem::path& path)
 void Shader::ReloadShader(const::std::filesystem::path& path)
 {
     std::cout << "Reloading shaders!" << std::endl;
+
+    std::uint32_t prevProgramID = m_ProgramID;
+
     CreateShader(path);
-    if (m_ProgramID == -1)
+    if (prevProgramID == -1)
     {
+        m_ProgramID = prevProgramID;
         return;
     }
 
-    glDeleteProgram(m_ProgramID);
+    glDeleteProgram(prevProgramID);
 
+}
+
+void Shader::uniformFloat(std::string id, float value)
+{
+    int location = glGetUniformLocation(m_ProgramID, id.c_str());
+    glUniform1f(location, value);
 }

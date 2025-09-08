@@ -20,6 +20,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_R)
     {
         shader.ReloadShader(s_ShaderPath);
+        s_ComputeShader = shader.GetProgram();
     }
 }
 
@@ -73,6 +74,10 @@ int main()
 
         {
             glUseProgram(s_ComputeShader);
+
+            //Uniforms
+            shader.uniformFloat("time", glfwGetTime());
+            
             glBindImageTexture(0, fb.Attatchment.ID, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
             const std::uint32_t groupSizeX = 16;
