@@ -1,0 +1,4 @@
+[submodule "ShaderRenderer/vendor/imgui"]
+	path = ShaderRenderer/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
